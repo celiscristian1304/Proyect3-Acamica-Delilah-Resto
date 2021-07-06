@@ -1,0 +1,634 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/celiscristian1304/spec2/1.0.0
+  - url: 'localhost:3000'
+info:
+  version: 1.0.0
+  title: Delilah Restó Acámica
+  description: Sprint project 3
+  contact:
+    name: Cristian Celis
+    url: https://github.com/celiscristian1304/Proyect3-Acamica-Delilah-Resto.git
+    email: celiscristian1304@gmail.com
+paths:
+  /products:
+    get:
+      summary: Get all products
+      tags:
+      - Products
+      responses:
+        '200':
+          description: 'Successful operation'
+          content: 
+            application/json:
+             schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/FullDish'
+              example:
+              - idProduct: 1
+                dish: "Pizzeta"
+                price: 12400.00
+                image: "http://lamonapizza.com/wp-content/uploads/2018/02/carnes.jpg"
+              - idProduct: 2
+                dish: "Pizza pequeña"
+                price: 22200.00
+                image: "http://lamonapizza.com/wp-content/uploads/2018/02/bbq.jpg"
+        '400':
+          $ref: '#/components/responses/400InvalidData'
+        '401':
+          $ref: '#/components/responses/401NotAuthorized'
+    post:
+      summary: Create a new product
+      tags:
+      - Products
+      responses:
+        '201':
+          description: Dish has been successfully created
+        '400':
+          $ref: '#/components/responses/400InvalidData'
+        '401':
+          $ref: '#/components/responses/401NotAuthorized'
+        '403':
+          $ref: '#/components/responses/403MissingToken' 
+        '409':
+          $ref: '#/components/responses/409RepeatedData'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dish'
+            example:
+                dish: Rissoto
+                price: 18000
+                image: http://lamonapizza.com/rissoto
+  /products/{idProduct}:
+    get:
+      summary: Get product by id
+      tags:
+      - Products
+      parameters:
+        - in: path
+          name: idProduct
+          required: true
+          schema:
+            type: integer
+          description: Id product 
+      responses:
+        '200':
+          description: 'List of products'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullDish'
+              example:
+                idProduct: 1
+                name: "empanada"
+                price: 1200
+                image: "http://test.com"
+        '400':
+          $ref: '#/components/responses/400InvalidData'
+        '401':
+          $ref: '#/components/responses/401NotAuthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+    put:
+      summary: Update product by id
+      tags:
+      - Products
+      parameters:
+        - $ref: '#/components/parameters/idProduct'
+        - in: query
+          name: attribute
+          schema:
+            type: string
+          description: The attribute has to be a string with the following possible values (dish,price,image)
+        - in: query
+          name: value
+          schema:
+            oneOf:
+              - type: string
+              - type: number
+          description: The value has to be a string with dish like a attribute, and number with price like a attribute
+      responses:
+        '200':
+          description: Update done.
+        '400':
+          $ref: '#/components/responses/400InvalidData'
+        '401':
+          $ref: '#/components/responses/401NotAuthorized'
+        '403':
+          $ref: '#/components/responses/403MissingToken'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '409':
+          $ref: '#/components/responses/409RepeatedData'
+    delete:
+      summary: Delete product by id - Hard delete
+      tags:
+      - Products
+      parameters:
+        - $ref: '#/components/parameters/idProduct'
+      responses:
+        '200':
+          description: The Id product has been deleted from database.
+        '400':
+          $ref: '#/components/responses/400InvalidData'
+        '401':
+          $ref: '#/components/responses/401NotAuthorized'
+        '403':
+          $ref: '#/components/responses/403MissingToken'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+  /user/myInfo:
+    get:
+      summary: Get logged user info
+      description: Just returns the logged user information
+      tags:
+      - User
+      responses:
+        '200':
+          description: OK 
+          content: 
+            application/json:
+             schema:
+               $ref: '#/components/schemas/UserInfo' 
+        '400':
+          $ref: '#/components/responses/400InvalidData'
+        '401':
+          $ref: '#/components/responses/401NotAuthorized'
+        '403':
+          $ref: '#/components/responses/403MissingToken'
+  /user/register:
+    post:
+      summary: Create a new user
+      tags:
+      - User
+      responses:
+        '201':
+          description: User was created successfully.
+        '400':
+          $ref: '#/components/responses/400InvalidData'
+        '409':
+          $ref: '#/components/responses/409RepeatedData'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegister'
+      security: []
+  /user/login:
+    post:
+      summary: Login to the app
+      tags:
+      - User
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            token:
+              schema:
+                type: string
+                example: "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoicHJ1ZWJhMiIsImlkVXNlciI6NCwicm9sIjoiMCIsImlhdCI6MTYyNTU2MTgzM30.RUaojurOqoMmHqDxDBokQFhSXXPtK9BtljSQ8_p7IXETMSxN-FcGDoCG6AjmgLCc55-2xVEdrwqqUSm10Enlng"
+        '400':
+          $ref: '#/components/responses/400InvalidData'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      security: []
+  /user:
+    get:
+      summary: Get all users like a admin
+      tags:
+      - User
+      responses:
+        '200':
+          description: OK 
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersArray'
+        '400':
+          $ref: '#/components/responses/400InvalidData'
+        '401':
+          $ref: '#/components/responses/401NotAuthorized'
+        '403':
+          $ref: '#/components/responses/403MissingToken'      
+  /order:
+    get:
+      summary: Get logged user orders or all orders like a admin
+      description: Just returns the logged user information
+      tags:
+      - Order
+      responses:
+        '200':
+          description: OK 
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiOrder'
+        '400':
+          $ref: '#/components/responses/400InvalidData'
+        '401':
+          $ref: '#/components/responses/401NotAuthorized'
+    post:
+      summary: Create a new order
+      tags:
+      - Order
+      responses:
+        '201':
+          description: Order created successfully.
+        '400':
+          $ref: '#/components/responses/400InvalidData'
+        '401':
+          $ref: '#/components/responses/401NotAuthorized'
+        '403':
+          $ref: '#/components/responses/403MissingToken'
+      requestBody:
+        required: true
+        content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewOrder'
+  /order/{status}/{idOrder}:
+    put:
+      summary: Update order status by id
+      tags:
+      - Order
+      parameters:
+        - in: path
+          name: status
+          required: true
+          schema:
+            type: string
+          description: Order status and the idea is to use N for New, C for confirmed, P for preparing, S for sending, X for canceled and D for delivered
+        - in: path
+          name: idOrder
+          required: true
+          schema:
+            type: string
+          description: id order done
+      responses:
+        '200':
+          description: 'New order status'
+        '400':
+          $ref: '#/components/responses/400InvalidData'
+        '401':
+          $ref: '#/components/responses/401NotAuthorized'
+        '403':
+          $ref: '#/components/responses/403MissingToken'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    idProduct:
+      name: idProduct
+      in: path
+      required: true
+      schema:
+        type: integer
+  schemas: 
+    Dish: 
+      type: object
+      properties: 
+        dish: 
+          type: string
+          maxLength: 100
+        price:  
+          type: number
+        image: 
+          type: string
+          maxLength: 500
+          description: url image
+      required:
+        - dish
+        - price
+    GetOrderDish:
+      properties:
+        idItem: 
+          type: integer
+          example: 1
+        idProduct: 
+          type: integer
+          example: 1
+        dish: 
+          type: string
+          example: "Pizzeta"
+        image: 
+          type: string
+          example: "http://lamonapizza.com/wp-content/uploads/2018/02/carnes.jpg"
+        priceOrdered: 
+          type: number
+          example: 12400.00
+    FullDish:
+      properties: 
+        idProduct:
+          type: integer
+        dish: 
+          type: string
+        price:  
+          type: number
+        image: 
+          type: string
+      example: 
+        idProduct: 1
+        dish: Lasagna
+        price: 14900.00
+        image: "http://lamonapizza.com/wp-content/uploads/2018/02/spaguetii.jpg"
+    UserInfo:
+      type: object
+      properties: 
+        idUser:
+          type: integer
+        user:
+          type: string
+        fullName:
+          type: string
+        mail:
+          type: string
+        countryIndicator:
+          type: integer
+        phone:
+          type: string
+        adress:
+          type: string
+        password:
+          type: string
+        rol:
+          type: string
+      example: 
+        idUser: 3
+        user: "jsecelisp"
+        fullName: "José Celis"
+        mail: "josecelisp@gmail.com"
+        countryIndicator: 57
+        phone: "3107961200"
+        adress: "calle falsa 123"
+        password: "Jose123."
+        rol: "0"
+    UserRegister:
+      properties: 
+        user:
+          type: string
+        fullName:
+          type: string
+        mail:
+          type: string
+        countryIndicator:
+          type: integer
+        phone:
+          type: string
+        adress:
+          type: string
+        password:
+          type: string
+      required:
+        - user
+        - fullName
+        - mail
+        - countryIndicator
+        - phone
+        - adress
+        - password
+      example: 
+        user: "prueba2"
+        fullName: "prueba eba"
+        mail: "a@a.com"
+        countryIndicator: 99
+        phone: "2636402"
+        adress: "123"
+        password: "lmg2468"
+    UserLogin:
+      properties: 
+        user:
+          type: string
+        password:
+          type: string
+      required:
+        - user
+        - password
+      example: 
+        user: "userTest"
+        password: "contra123"
+    UsersArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserInfo' 
+      example:
+        - idUser: 1
+          user: "admin"
+          fullName: "Cristian Celis"
+          mail: "celiscristian1304@gmail.com"
+          countryIndicator: 57
+          phone: "3115217587"
+          adress: "calle 25G #74B-50"
+          password: "Cris123."
+          rol: "1"
+        - idUser: 2
+          user: "lcruz13"
+          fullName: "Laura Cruz"
+          mail: "lcruz1798@gmail.com"
+          countryIndicator: 57
+          phone: "3023259883"
+          adress: "calle 100 esperanza"
+          password: "Laura123."
+          rol": "0"
+    SimpleOrder:
+      properties:
+        idOrder: 
+          type: integer
+          example: 1
+        status: 
+          type: string
+          example: "C"
+        methodPayment: 
+          type: string
+          example: "C"
+        total: 
+          type: number
+          example: 43200.00
+        deliveryAddress: 
+          type: string
+          example: "calle 100"
+        date: 
+          type: string
+          example: "2021-07-05T13:15:54.000Z"
+        idUser: 
+          type: integer
+          example: 2
+        user: 
+          type: string
+          example: "lcruz13"
+        fullName: 
+          type: string
+          example: "Laura Cruz"
+        mail: 
+          type: string
+          example: "lcruz1798@gmail.com"
+        countryIndicator: 
+          type: integer
+          example: 57
+        phone: 
+          type: string
+          example: "3023259883"
+        userAdress: 
+          type: string
+          example: "calle 100 esperanza"
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetOrderDish'
+          example:
+            - idItem: 2
+              idProduct: 5
+              dish: "Spaguetti"
+              image: "http://lamonapizza.com/wp-content/uploads/2018/02/spaguetii.jpg"
+              priceOrdered: 14900.00
+            - idItem: 3
+              idProduct: 7
+              dish: "Canelone"
+              image: "http://lamonapizza.com/wp-content/uploads/2018/02/vegetarianosra.jpg"
+              priceOrdered: 15900.00
+    MultiOrder:
+      type: object
+      items: 
+        $ref: '#/components/schemas/SimpleOrder'
+      example: 
+        - idOrder: 1
+          status: "C"
+          methodPayment: "C"
+          total: "43200.00"
+          deliveryAddress: "calle 100"
+          date: "2021-07-05T13:15:54.000Z"
+          idUser: 2
+          user: "lcruz13"
+          fullName: "Laura Cruz"
+          mail: "lcruz1798@gmail.com"
+          countryIndicator: 57
+          phone: "3023259883"
+          userAdress: "calle 100 esperanza"
+          items: [
+              {
+                "idItem": 1,
+                "idProduct": 1,
+                "dish": "Pizzeta",
+                "image": "http://lamonapizza.com/wp-content/uploads/2018/02/carnes.jpg",
+                "priceOrdered": "12400.00"
+            },
+            {
+                "idItem": 2,
+                "idProduct": 5,
+                "dish": "Spaguetti",
+                "image": "http://lamonapizza.com/wp-content/uploads/2018/02/spaguetii.jpg",
+                "priceOrdered": "14900.00"
+            },
+            {
+                "idItem": 3,
+                "idProduct": 7,
+                "dish": "Canelone",
+                "image": "http://lamonapizza.com/wp-content/uploads/2018/02/vegetarianosra.jpg",
+                "priceOrdered": "15900.00"
+            }
+          ]
+        - idOrder: 2
+          status: "X"
+          methodPayment: "CD"
+          total: "99300.00"
+          deliveryAddress: "km2 bogota-chia"
+          date: "2021-07-05T09:49:12.000Z"
+          idUser: 3
+          user: "jsecelisp"
+          fullName: "José Celis"
+          mail: "josecelisp@gmail.com"
+          countryIndicator: 57
+          phone: "3107961200"
+          userAdress: "calle falsa 123"
+          items: [
+            {
+                "idItem": 4,
+                "idProduct": 1,
+                "dish": "Pizzeta",
+                "image": "http://lamonapizza.com/wp-content/uploads/2018/02/carnes.jpg",
+                "priceOrdered": "12400.00"
+            },
+            {
+                "idItem": 5,
+                "idProduct": 4,
+                "dish": "Pizza grande",
+                "image": "http://lamonapizza.com/wp-content/uploads/2018/02/vegetales.jpg",
+                "priceOrdered": "42200.00"
+            },
+            {
+                "idItem": 6,
+                "idProduct": 5,
+                "dish": "Spaguetti",
+                "image": "http://lamonapizza.com/wp-content/uploads/2018/02/spaguetii.jpg",
+                "priceOrdered": "14900.00"
+            },
+            {
+                "idItem": 7,
+                "idProduct": 9,
+                "dish": "Fetuccine",
+                "image": "http://lamonapizza.com/wp-content/uploads/2018/02/fetuccini.jpg",
+                "priceOrdered": "14900.00"
+            },
+            {
+                "idItem": 8,
+                "idProduct": 11,
+                "dish": "Lomitos BBQ",
+                "image": "http://lamonapizza.com/wp-content/uploads/2018/02/15.jpg",
+                "priceOrdered": "14900.00"
+            }
+          ]
+    NewOrder:
+      type: object
+      properties:
+        methodPayment: 
+          type: string
+          example: "CD"
+        deliveryAddress: 
+          type: string
+          example: "mainStreet on silicon valey"
+        items:
+          description: An array with the selected dishes IDs
+          type: integer
+          example: 
+            - 1
+            - 3
+            - 5
+      required:
+        - methodPayment
+        - deliveryAddress
+        - items
+  responses:
+    400InvalidData:
+      description: Data invalid (wrong sintax or spelled)
+    401NotAuthorized:
+      description: You are not authenticated. Please authenticate and try again
+    403MissingToken:
+      description: Without permission to access
+    404NotFound:
+      description: Data not found
+    409RepeatedData:
+      description: Value not available  because it already exists
+security:
+  - bearer: []
+tags:
+  - name: Products
+    description: Products management
+  - name: User
+    description: Users management
+  - name: Order
+    description: Orders management
