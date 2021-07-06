@@ -22,8 +22,8 @@ Sprint3-Acámica-NodeJS-DelilahResto
   6.1.	Se crearan cuatro (4) tablas en la base de datos con el nombre que le otorgó desde el archivo “.env” (user, producto, order, itemOrder); y cada una de estas tablas cuenta con información básica para el funcionamiento de la aplicación.
   6.2.	Se utilizarán las conexiones a los puertos indicados en el archivo “.env”. 
 7.	Para detener la aplicación, solo ingrese el comando “Ctrl + C” en la terminal para realizar desconexiones de puertos. 
-8.	Para el uso de los endpoints, por favor dirigirse al archivo “spec.yml”.
+8.	Para el uso de los endpoints, por favor dirigirse al archivo “spec.yaml”.
   8.1.	Nota: El usuario administrador posee la siguiente credencial:
     8.1.1.	Usuario: admin
     8.1.2.	Contraseña: Cris123. (punto incluido).
-  8.2.	Para conocer las credenciales de los otros dos usuarios, utilizar el endpoint “/user” de acuerdo con la explicación del archivo “spec.yml”. 
+  8.2.	Para conocer las credenciales de los otros dos usuarios, utilizar el endpoint “/user” de acuerdo con la explicación del archivo “spec.yaml”. 
