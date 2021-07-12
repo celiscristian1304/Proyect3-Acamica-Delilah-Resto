@@ -164,7 +164,26 @@ paths:
           $ref: '#/components/responses/403MissingToken'
   /user/register:
     post:
-      summary: Create a new user
+      summary: Create a new customer user
+      tags:
+      - User
+      responses:
+        '201':
+          description: User was created successfully.
+        '400':
+          $ref: '#/components/responses/400InvalidData'
+        '409':
+          $ref: '#/components/responses/409RepeatedData'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegister'
+      security: []
+  /user/register/admin:
+    post:
+      summary: Create a new admin user
       tags:
       - User
       responses:
@@ -278,6 +297,29 @@ paths:
       responses:
         '200':
           description: 'New order status'
+        '400':
+          $ref: '#/components/responses/400InvalidData'
+        '401':
+          $ref: '#/components/responses/401NotAuthorized'
+        '403':
+          $ref: '#/components/responses/403MissingToken'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+  /order/{idOrder}:
+    delete:
+      summary: Delete an order by its ID (hard-delete)
+      tags:
+      - Order
+      parameters:
+        - in: path
+          name: idOrder
+          required: true
+          schema:
+            type: integer
+          description: id order to be deleted
+      responses:
+        '200':
+          description: 'Id order has been deleted'
         '400':
           $ref: '#/components/responses/400InvalidData'
         '401':

@@ -44,7 +44,7 @@ function middlewareRolUser(req,res,next) {
     };
 };
 
-/* POST - Create a new user ----------------------------------------------------------------------------------------- */
+/* POST - Create a new customer user ----------------------------------------------------------------------------------------- */
 
 serverData.server.post("/user/register", (req,res) => {
     const {user,fullName,mail,countryIndicator,phone,adress,password} = req.body;
@@ -79,6 +79,52 @@ serverData.server.post("/user/register", (req,res) => {
                     _phone: newUser.phone,
                     _adress: newUser.adress,
                     _password: cypherPass
+                }, type: connectionData.sequelize.QueryTypes.INSERT})
+                .then((queryresult) => {
+                    res.status(201);
+                    res.send(`User '${newUser.user}' was created successfully.`);
+                });
+            };
+        });
+    };
+});
+
+/* POST - Create a new admin user ----------------------------------------------------------------------------------------- */
+
+serverData.server.post("/user/register/admin", (req,res) => {
+    const {user,fullName,mail,countryIndicator,phone,adress,password} = req.body;
+    const newUser = {
+        user,
+        fullName,
+        mail,
+        countryIndicator,
+        phone,
+        adress,
+        password
+    };
+    const cypherPass = cryptoJs.AES.encrypt(newUser.password,passAes).toString();
+
+    if(!newUser.user || !newUser.fullName || !newUser.mail || !newUser.countryIndicator || !newUser.phone || !newUser.adress || !newUser.password){
+        res.status(400);
+        res.send("The information is incomplete, please verify that all the information is sent.");
+    }else{
+        connectionData.sequelize.query(`SELECT * FROM user WHERE user = :_user`,
+        {replacements:{_user: newUser.user}, type: connectionData.sequelize.QueryTypes.SELECT})
+        .then((queryresult) => {
+            if(queryresult.length != 0){
+                res.status(409);
+                res.send("User is not available, please try another user.");
+            }else{
+                connectionData.sequelize.query(`INSERT INTO user (user,fullName,mail,countryIndicator,phone,adress,password,rol) VALUES (:_user,:_fullName,:_mail,:_countryIndicator,:_phone,:_adress,:_password,:_rol)`,
+                {replacements:{
+                    _user: newUser.user,
+                    _fullName: newUser.fullName,
+                    _mail: newUser.mail,
+                    _countryIndicator: newUser.countryIndicator,
+                    _phone: newUser.phone,
+                    _adress: newUser.adress,
+                    _password: cypherPass,
+                    _rol: 1
                 }, type: connectionData.sequelize.QueryTypes.INSERT})
                 .then((queryresult) => {
                     res.status(201);

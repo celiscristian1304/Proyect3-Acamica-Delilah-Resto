@@ -8,6 +8,21 @@ require('dotenv').config();
 
 serverData.server.use(serverData.express.json());
 
+/* Functions to use */
+
+function idValidation(idProduct, productsArray){
+    let productFiltered = [];
+    /* The following line makes the filter by id */
+    productFiltered = productsArray.filter(element => {
+        return element.idOrder === parseInt(idProduct);
+    });
+    if(productFiltered.length === 0){
+        return true;
+    }else{
+        return false;
+    };
+};
+
 /* Function to use in all endpoints except user login and register */
 function middlewareVerifyJwt(req,res,next) {
     const tokenToApprove = tokenVerify.verify(req.headers);
@@ -174,5 +189,31 @@ serverData.server.put("/order/:status/:idOrder", middlewareVerifyJwt, middleware
     .then((queryresult) => {
         res.status(200);
         res.send("Update done.");
+    });
+});
+
+/* DELETE - Delete an order with its all products ---------------------------------------------------------------------------------------- */
+
+/* Completely remove an order */
+serverData.server.delete("/order/:idOrder", middlewareVerifyJwt, middlewareRolAdmin, (req,res) => {
+    
+    const idOrder = req.params.idOrder;
+
+    connectionData.sequelize.query(`SELECT * FROM ${process.env.DB_NAME}.order WHERE idOrder = :_idOrder`,
+    {replacements:{_idOrder: idOrder}, type: connectionData.sequelize.QueryTypes.SELECT})
+    .then((queryresult) => {
+        let notId = idValidation(idOrder, queryresult);
+        if(notId){
+            res.status(404);
+            res.send("The ID order does not exist in database, please enter a valid ID.");
+        }else{
+            connectionData.sequelize.query(`DELETE FROM ${process.env.DB_NAME}.itemOrder WHERE idOrder = :_idOrder`,
+            {replacements:{_idOrder: idOrder}, type: connectionData.sequelize.QueryTypes.DELETE})
+            .then(async (queryresult) => {
+                await connectionData.sequelize.query(`DELETE FROM ${process.env.DB_NAME}.order WHERE idOrder = :_idOrder`, {replacements:{_idOrder: idOrder}, type: connectionData.sequelize.QueryTypes.DELETE});
+                res.status(200);
+                res.send(`The order ${idOrder} has been deleted from database.`);
+            });
+        };
     });
 });
